@@ -1,0 +1,27 @@
+!------------------
+!  URxvt Settings
+!------------------
+
+! scrollbar
+URxvt*scrollBar: false
+URxvt*internalBorder: 20
+
+URxvt*letterSpace: 0
+!----------------
+!  Xft Settings
+!----------------
+
+Xft*antialias:  true
+Xft*hinting:    true
+Xft*rgba:       rgb
+Xft*autohint:   false
+Xft*hintstyle:  hintfull
+Xft*lcdfilter:  lcddefault
+
+!----------------
+!  Font Setting
+!----------------
+
+URxvt.font: xft:FuraCode Nerd Font:style=Regular:size=14
+URxvt.boldFont: xft:FuraCode Nerd Font:style=Bold:size=14
+

@@ -1,0 +1,185 @@
+#!/bin/bash
+
+. panel_colors
+
+PANEL_FIFO=/tmp/panel-fifo
+PANEL_HEIGHT=25
+PANEL_FONT_FAMILY="FuraCode Nerd Font:size=12"
+# export PANEL_FIFO PANEL_HEIGHT PANEL_FONT_FAMILY
+
+# setup
+if [ $(pgrep -cx panel) -gt 1 ] ; then
+  printf "%s\n" "The panel is already running." >&2
+  exit 1
+fi
+
+trap 'trap - TERM; kill 0' INT TERM QUIT EXIT
+
+[ -e "$PANEL_FIFO" ] && rm "$PANEL_FIFO"
+mkfifo "$PANEL_FIFO"
+
+bspc config top_padding $PANEL_HEIGHT
+bspc subscribe report > "$PANEL_FIFO" &
+# find out how to make this scroll
+xtitle -sf 'T%s\n' -t 20 > "$PANEL_FIFO" &
+
+# clock
+while true;
+  do
+    echo -e "C%{F$COLOR_ICONS}\uf017%{F-}" $(date +"%l:%M %p");
+  sleep 5;
+done > "$PANEL_FIFO" &
+
+# date
+while true;
+do echo -e "D%{F$COLOR_ICONS}\uf073%{F-}" $(date +'%b %d')
+  sleep 5
+done > $PANEL_FIFO &
+
+# battery
+while true;
+do
+    BATTERY=$(cat /sys/class/power_supply/BAT0/capacity)
+    STATUS=$(cat /sys/class/power_supply/BAT0/status)
+    if [[ "$STATUS" == "Discharging" ]]
+    then
+        if [ $BATTERY -ge 80 ]
+        then
+            icon_battery='\uf240'
+        fi
+
+        if [ $BATTERY -ge 50 -a $BATTERY -lt 80 ]
+        then
+            icon_battery='\uf241'
+        fi
+
+        if [ $BATTERY -ge 30 -a $BATTERY -lt 50 ]
+        then
+            icon_battery='\uf242'
+        fi
+
+        if [ $BATTERY -gt 10 -a $BATTERY -lt 30 ]
+        then
+            icon_battery='\uf243'
+        fi
+
+        if [ $BATTERY -lt 10 ]
+        then
+            icon_battery='\uf244'
+        fi
+        echo -e "B%{F$COLOR_ICONS}$icon_battery%{F-} $BATTERY%"
+        sleep 30;
+    else
+        if [[ -f /tmp/.battery.charging ]]
+        then
+            N=$(cat /tmp/.battery.charging)
+            if [[ $N -eq 1 ]]
+            then
+                charging_icon='\uf243'
+                echo 2 > /tmp/.battery.charging
+            elif [[ $N -eq 2 ]]
+            then
+                charging_icon='\uf242'
+                echo 3 > /tmp/.battery.charging
+            elif [[ $N -eq 3 ]]
+            then
+                charging_icon='\uf241'
+                echo 4 > /tmp/.battery.charging
+            else 
+                charging_icon='\uf240'
+                echo 1 > /tmp/.battery.charging
+            fi
+        else
+            charging_icon='\uf240'
+            echo 1 > /tmp/.battery.charging
+        fi
+        echo -e B%{F$COLOR_ICONS}$charging_icon%{F-} $BATTERY%
+        sleep 1;
+    fi
+done > "$PANEL_FIFO" &
+
+# alsa volume
+while true;
+do
+VOLUME=$(query_vol)
+STATE=$(query_mute)
+
+if [[ "$STATE" == "false" ]]
+then
+    if [ $VOLUME -ge 70 ]
+    then
+        icon_vol='\uf028'
+    fi
+    if [ $VOLUME -gt 0 -a $VOLUME -lt 70 ]
+    then
+        icon_vol='\uf027'
+    fi
+    if [ $VOLUME -eq 0 ]
+    then
+        icon_vol='\uf026'
+    fi
+    echo -e "V%{F$COLOR_ICONS}$icon_vol%{F-} $VOLUME"
+else
+    echo -e V"%{F$COLOR_ICONS}\uf026%{F-} mute"
+fi
+  sleep 0.5
+done > $PANEL_FIFO &
+
+
+# wifi
+while true;
+do
+WIFI_SSID=$(iw wlo1 link | grep 'SSID' | sed 's/SSID: //' | sed 's/\t//')
+if [[ -z $WIFI_SSID ]]
+then
+    echo -e L"%{F$COLOR_ICONS}\uf072%{F-}"
+else
+    echo -e L"%{F$COLOR_ICONS}%{F-}" $WIFI_SSID  
+fi
+  sleep 10
+done > $PANEL_FIFO &
+
+# disk space
+while true;
+do
+  DIR=$(df -hlP /home | grep void | sed 's/ \+/ /g' | cut -d' ' -f6)
+  FREE_SPACE=$(df -hlP /home | grep void | sed 's/ \+/ /g' | cut -d' ' -f4)
+  echo -e F"%{F$COLOR_ICONS}%{F-}" $FREE_SPACE
+  sleep 10
+done > $PANEL_FIFO &
+
+# ram used
+while true;
+do
+    RAM_USED=$(free | grep Mem | awk '{print $3/$2 * 100.0}')
+    RAM_USED=$(printf "%.1f" "$RAM_USED")
+    echo -e "R%{F$COLOR_ICONS}\uf0e4%{F-} $RAM_USED%"
+    sleep 1
+done > $PANEL_FIFO &
+
+# cpu usage
+while true;
+do
+    CPU=$(mpstat 1 1 | tail -n 1 | awk '$12 ~ /[0-9.]+/ { print 100 - $12  }')
+    CPU=$(printf "%.1f" "$CPU")
+    echo -e "P%{F$COLOR_ICONS}\uf2db%{F-} $CPU%"
+    sleep 1
+done > $PANEL_FIFO &
+
+
+# temperature
+while true;
+do
+    TEMP=$(sensors | grep id | cut -d' ' -f5 | tr -d '+°C')
+    if (( $(echo "$TEMP > 70.0" | bc -l) )); then
+        echo -e "A%{F$COLOR_ICONS}\uf2c7%{F-} $TEMP°C"
+    else
+        echo -e "A"
+    fi
+    sleep 5
+done > $PANEL_FIFO &
+
+cat "$PANEL_FIFO" | panel_bar | lemonbar -g x$PANEL_HEIGHT -f "$PANEL_FONT_FAMILY" -F "$COLOR_FOREGROUND" -B "$COLOR_BACKGROUND" -u 2 | bash &
+
+wait
+
