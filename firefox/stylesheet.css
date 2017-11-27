@@ -1,0 +1,103 @@
+/* 
+ * Minimal Firefox Homepage
+ *
+ * Author: clyde80
+ * Website: https://github.com/clyde80
+ * Created on: February 05, 2017
+ * Updated on: February 06, 2017
+ *
+ * Colors:
+ * Red: #A26A5B
+ * Yellow: #FAE8A4
+ * Green: #406158
+ * Black: #211716
+ *
+ */
+html, body {
+    margin: 0;
+    padding: 0;
+    background-color: #2E1134;
+    color: #458675;
+}
+
+/* 
+ * Use the following code to center stuff in browser window in future.
+ *
+ * Source: (https://www.w3.org/Style/Examples/007/center-example)
+ */
+#main-container {
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    display: table;
+}
+
+#content-container {
+    text-align: center;
+    display: table-cell;
+    vertical-align: middle;
+}
+/* End of centering stuff in browser window. */
+
+@media only screen and (min-width: 481px) {
+    #search {
+        width: 400px;
+    }
+
+    #column-container ul {
+        display: inline-block;
+    }
+}
+
+@media only screen and (max-width: 480px) {
+    #search {
+        width: 300px;
+    }
+
+    #column-container ul {
+        display: block;
+    }
+}
+
+#search {
+    padding: 5px 5px;
+    border: 1px solid #817085;
+    color: #E4E6E8;
+    background-color: #817085;
+    font-family: "FuraCode Nerd Font";
+    transition: color 0.5s, background-color 0.5s, border 0.5s;
+    -webkit-transition: color 0.5s, background-color 0.5s, border 0.5s;
+}
+
+#search:focus {
+    color: #458675;
+    background-color: #211716;
+    border-bottom: 1px solid #458675;
+}
+
+#column-container ul {
+    padding: 10px;
+    list-style-type: none;
+    vertical-align: top;
+}
+
+#column-container ul li {
+    font-family: "FuraCode Nerd Font";
+}
+
+#column-container ul li:first-child {
+    color: #458675;
+}
+
+#column-container ul li a {
+    color: #817085;
+    font-size: 11px;
+    text-decoration: none;
+}
+
+#column-container ul li a:hover {
+    color: #458675;
+}
+

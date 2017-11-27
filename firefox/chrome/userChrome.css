@@ -1,0 +1,15 @@
+#nav-bar, #appcontent, #identity-box, #TabsToolbar {
+    background: #2E1134 !important;
+}
+
+.tab-background[selected="true"] {
+    background: #2E1134 !important;
+}
+
+#urlbar, .tab-background[selected="false"], .tabbrowser-tabs  {
+    background: #817085 !important;
+}
+
+.tab-line[selected="true"] {
+    background: #458675 !important;
+}
