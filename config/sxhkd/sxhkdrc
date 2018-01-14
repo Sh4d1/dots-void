@@ -8,7 +8,7 @@ super + Return
 
 # program launcher
 super + @space
-	rofi -show run -hide-scrollbar -width 20 -lines 1 -columns 2
+	rofi -show run -hide-scrollbar -width 25 -lines 1 -columns 2 -separator-style solid -yoffset 30 -location 2
 
 super + shift + space
     rofi-pass
@@ -28,7 +28,7 @@ super + Delete
 
 # quit bspwm normally
 super + alt + Escape
-    exit_bspwm
+    /home/patrik/bin/exit_bspwm
 
 # close and kill
 super + {_,shift + }q
@@ -89,7 +89,7 @@ super + {o,i}
 	bspc wm -h on
 
 # focus or send to the given desktop
-super + {_,shift + }{ampersand,eacute,quotedbl,apostrophe,parenleft,minus,egrave,underscore,ccedilla,agrave}
+super + {_,shift + }{1-9,0}
 	bspc {desktop -f,node -d} '^{1-9,10}'
 
 #

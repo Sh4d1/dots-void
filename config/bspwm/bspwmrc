@@ -1,17 +1,18 @@
 #! /bin/sh
-xinput set-prop 15 307 1 1
+xinput set-prop 16 307 1 1
 wal -R
 sxhkd &
 pulseaudio &
 start-dunst &
 # feh --bg-fill ~/.wallpapers/void.jpg
 xrdb -merge ~/.Xresources
-
 panel &
 
-bspc monitor -d term web devel srv media misc tmp 
+compton -bcCG --shadow-exclude '!focused' --no-fading-openclose
 
-bspc config border_width         1
+bspc monitor -d      
+
+bspc config border_width         0
 bspc config window_gap          20
 
 bspc config split_ratio          0.50

@@ -3,8 +3,8 @@
 . panel_colors
 
 PANEL_FIFO=/tmp/panel-fifo
-PANEL_HEIGHT=25
-PANEL_FONT_FAMILY="FuraCode Nerd Font:size=12"
+PANEL_HEIGHT=30
+PANEL_FONT_FAMILY="FuraCode Nerd Font:size=13"
 # export PANEL_FIFO PANEL_HEIGHT PANEL_FONT_FAMILY
 
 # setup
@@ -18,10 +18,9 @@ trap 'trap - TERM; kill 0' INT TERM QUIT EXIT
 [ -e "$PANEL_FIFO" ] && rm "$PANEL_FIFO"
 mkfifo "$PANEL_FIFO"
 
+#xtitle -sf 'T%s\n' -t 20 > "$PANEL_FIFO" &
 bspc config top_padding $PANEL_HEIGHT
 bspc subscribe report > "$PANEL_FIFO" &
-# find out how to make this scroll
-xtitle -sf 'T%s\n' -t 20 > "$PANEL_FIFO" &
 
 # clock
 while true;
@@ -129,7 +128,7 @@ done > $PANEL_FIFO &
 # wifi
 while true;
 do
-WIFI_SSID=$(iw wlo1 link | grep 'SSID' | sed 's/SSID: //' | sed 's/\t//')
+WIFI_SSID=$(iw wlp2s0 link | grep 'SSID' | sed 's/SSID: //' | sed 's/\t//')
 if [[ -z $WIFI_SSID ]]
 then
     echo -e L"%{F$COLOR_ICONS}\uf072%{F-}"
@@ -160,10 +159,10 @@ done > $PANEL_FIFO &
 # cpu usage
 while true;
 do
-    CPU=$(mpstat 1 1 | tail -n 1 | awk '$12 ~ /[0-9.]+/ { print 100 - $12  }')
-    CPU=$(printf "%.1f" "$CPU")
-    echo -e "P%{F$COLOR_ICONS}\uf2db%{F-} $CPU%"
-    sleep 1
+        CPU=$(mpstat 1 1 | tail -n 1 | awk '$12 ~ /[0-9.]+/ { print 100 - $12  }')
+        CPU=$(printf "%.1f" "$CPU")
+        echo -e "P%{F$COLOR_ICONS}\uf2db%{F-} $CPU%"
+        sleep 1
 done > $PANEL_FIFO &
 
 
@@ -179,7 +178,7 @@ do
     sleep 5
 done > $PANEL_FIFO &
 
-cat "$PANEL_FIFO" | panel_bar | lemonbar -g x$PANEL_HEIGHT -f "$PANEL_FONT_FAMILY" -F "$COLOR_FOREGROUND" -B "$COLOR_BACKGROUND" -u 2 | bash &
+cat "$PANEL_FIFO" | panel_bar | lemonbar -g x$PANEL_HEIGHT+0+$SECOND_HEIGHT -f "$PANEL_FONT_FAMILY" -F "$COLOR_FOREGROUND" -B "$COLOR_BACKGROUND" -u 2 | bash &
 
 wait
 
