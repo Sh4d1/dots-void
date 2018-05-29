@@ -1,0 +1,28 @@
+#! /bin/sh
+#
+# Example panel for LemonBoy's bar
+
+. panel_colors
+
+PADDING=" "
+SEP="//"
+
+while read -r line ; do
+  case $line in
+    L*)
+      # wifi link
+      wifi="%{B$COLOR_BACKGROUND}$PADDING${line#?}$PADDING"
+      ;;
+    F*)
+      # free space /home
+      free="%{B$COLOR_BACKGROUND}$PADDING${line#?}$PADDING%{B-}"
+      ;;
+    B*)
+      # battery percent output
+      # battery="%{A:bat.sh:}$PADDING${line#?}$PADDING%{A}"
+      battery="%{B$COLOR_BACKGROUND}$PADDING${line#?}$PADDING%{B-}"
+      ;;
+  esac
+  layout="%{r}$wifi$battery"
+  printf "%s\n" "${layout}"
+done

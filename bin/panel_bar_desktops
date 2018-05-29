@@ -1,0 +1,60 @@
+#! /bin/sh
+#
+# Example panel for LemonBoy's bar
+
+. panel_colors
+
+num_mon=$(bspc query -M | wc -l)
+PADDING=" "
+SEP="//"
+layout=""
+
+while read -r line ; do
+  case $line in
+    W*)
+      # bspwm internal state
+      layout=""
+      IFS=':'
+      set -- ${line#?}
+      while [ $# -gt 0 ] ; do
+        item=$1
+        name=${item#?}
+        case $item in
+          O*)
+            # focused occupied desktop
+            layout="${layout}%{F$COLOR_FOCUSED_OCCUPIED_FG}"
+            layout="${layout} ﱣ %{F-}"
+            ;;
+          F*)
+            # focused free desktop
+            layout="${layout}%{F$COLOR_FOCUSED_FREE_FG}"
+            layout="${layout} ﱤ %{F-}"
+            ;;
+          U*)
+            # focused urgent desktop
+            layout="${layout}%{F$COLOR_FOCUSED_URGENT_FG}"
+            layout="${layout}  %{F-}"
+            ;;
+          o*)
+            # occupied desktop
+            layout="${layout}%{F$COLOR_OCCUPIED_FG}"
+            layout="${layout} ﱣ %{F-}"
+            ;;
+          f*)
+            # free desktop
+            layout="${layout}%{F$COLOR_FREE_FG}"
+            layout="${layout} ﱤ %{F-}"
+            ;;
+          u*)
+            # urgent desktop
+            layout="${layout}%{F$COLOR_URGENT_FG}"
+            layout="${layout}  %{F-}"
+            ;;
+        esac
+        shift
+      done
+      ;;
+  esac
+  layout="%{B$COLOR_BACKGROUND}$layout%{B-}"
+  printf "%s\n" "${layout}"
+done

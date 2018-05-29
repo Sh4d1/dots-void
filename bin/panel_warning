@@ -1,0 +1,85 @@
+#!/bin/bash
+
+. panel_colors
+
+PANEL_FIFO=/tmp/panel-warning
+PANEL_HEIGHT=30
+PANEL_WIDTH=500
+XOFF=1100
+YOFF=10
+PANEL_FONT_FAMILY="FuraCode Nerd Font:size=13"
+# export PANEL_FIFO PANEL_HEIGHT PANEL_FONT_FAMILY
+
+# setup
+if [ $(pgrep -cx panel_warning) -gt 1 ] ; then
+  printf "%s\n" "The panel is already running." >&2
+  exit 1
+fi
+
+trap 'trap - TERM; kill 0' INT TERM QUIT EXIT
+
+[ -e "$PANEL_FIFO" ] && rm "$PANEL_FIFO"
+mkfifo "$PANEL_FIFO"
+
+#xtitle -sf 'T%s\n' -t 20 > "$PANEL_FIFO" &
+bspc config top_padding $PANEL_HEIGHT
+
+# disk space
+while true;
+do
+  DIR=$(df -hlP /home | grep void | sed 's/ \+/ /g' | cut -d' ' -f6)
+  FREE_SPACE=$(df -hlP /home | grep void | sed 's/ \+/ /g' | cut -d' ' -f4)
+  RAW_SPACE=$(echo $FREE_SPACE | cut -d'G' -f1)
+  if [[ $RAW_SPACE -lt 50 ]]; then
+    echo -e F"%{F$COLOR_URGENT_FG}%{F-}" $FREE_SPACE
+  else
+      echo -e "f"
+  fi
+  sleep 60
+done > $PANEL_FIFO &
+
+# ram used
+while true;
+do
+    RAM_USED=$(free | grep Mem | awk '{print $3/$2 * 100.0}')
+    RAM_USED=$(printf "%.1f" "$RAM_USED")
+    RAM=$(echo $RAM_USED | cut -d'.' -f1)
+    if [[ $RAM -gt 80 ]]; then
+        echo -e "R%{F$COLOR_ICONS}\uf0e4%{F-} $RAM_USED%"
+    else
+        echo -e "r"
+    fi
+    sleep 1
+done > $PANEL_FIFO &
+
+# cpu usage
+while true;
+do
+        CPU=$(mpstat 1 1 | tail -n 1 | awk '$12 ~ /[0-9.]+/ { print 100 - $12  }')
+        CPU=$(printf "%.1f" "$CPU")
+        CPU_ROUND=$(echo $CPU | cut -d'.' -f1)
+        if [[ $CPU_ROUND -gt 80 ]]; then
+            echo -e "P%{F$COLOR_ICONS}\uf2db%{F-} $CPU%"
+        else
+            echo -e "p"
+        fi
+        sleep 1
+done > $PANEL_FIFO &
+
+
+# temperature
+while true;
+do
+    TEMP=$(sensors | grep id | cut -d' ' -f5 | tr -d '+°C')
+    if (( $(echo "$TEMP > 70.0" | bc -l) )); then
+        echo -e "A%{F$COLOR_ICONS}\uf2c7%{F-} $TEMP°C"
+    else
+        echo -e "a"
+    fi
+    sleep 5
+done > $PANEL_FIFO &
+
+cat "$PANEL_FIFO" | panel_bar_warning | lemonbar -g "$PANEL_WIDTH"x$PANEL_HEIGHT+$XOFF+$YOFF -f "$PANEL_FONT_FAMILY" -F "$COLOR_FOREGROUND" -u 2 | bash &
+
+wait
+

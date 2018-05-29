@@ -1,0 +1,23 @@
+#!/bin/bash
+
+source "/home/patrik/.cache/wal/colors.sh"
+
+pactl set-sink-mute 0 toggle
+mute=$(query_vol)
+icon=""
+if [[ $(query_mute) == "true" ]]; then
+	icon=""
+  mute="mute"
+fi
+
+MSG="$icon $mute"
+color0=$(printf "#%06X" $((0x$(echo $color0 | cut -d '#' -f2) + 0x3F4F1)))
+color3=$(printf "#%06X" $((0x$(echo $color3 | cut -d '#' -f2) + 0x3F4F1)))
+
+
+MSG="<span style=\"color: $color3;\">$icon</span> $mute"
+twmnc -c "$MSG" --id 50 -p 9798 --bg $color0
+
+
+
+

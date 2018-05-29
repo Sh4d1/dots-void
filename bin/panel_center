@@ -1,0 +1,46 @@
+#!/bin/bash
+
+. panel_colors
+
+PANEL_FIFO=/tmp/panel-center
+PANEL_HEIGHT=30
+PANEL_WIDTH=250
+XOFF=835
+YOFF=10
+PANEL_FONT_FAMILY="FuraCode Nerd Font:size=12"
+# export PANEL_FIFO PANEL_HEIGHT PANEL_FONT_FAMILY
+
+# setup
+if [ $(pgrep -cx panel-desktop) -gt 1 ] ; then
+  printf "%s\n" "The panel is already running." >&2
+  exit 1
+fi
+
+trap 'trap - TERM; kill 0' INT TERM QUIT EXIT
+
+[ -e "$PANEL_FIFO" ] && rm "$PANEL_FIFO"
+mkfifo "$PANEL_FIFO"
+
+#xtitle -sf 'T%s\n' -t 20 > "$PANEL_FIFO" &
+bspc config top_padding $PANEL_HEIGHT
+
+# clock
+while true;
+  do
+    echo -e "C%{F$COLOR_ICONS}\uf017%{F-}" $(date +"%l:%M %p");
+    sleep 5;
+done > "$PANEL_FIFO" &
+
+
+# date
+while true;
+do 
+    echo -e "D%{F$COLOR_ICONS}\uf073%{F-}" $(date +'%b %d')
+    sleep 5;
+done > $PANEL_FIFO &
+
+
+cat "$PANEL_FIFO" | panel_bar_center | lemonbar -g ${PANEL_WIDTH}x$PANEL_HEIGHT+$XOFF+$YOFF -f "$PANEL_FONT_FAMILY" -F "$COLOR_FOREGROUND" -u 2 | bash &
+
+wait
+

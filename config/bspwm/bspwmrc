@@ -6,11 +6,24 @@ pulseaudio &
 start-dunst &
 # feh --bg-fill ~/.wallpapers/void.jpg
 xrdb -merge ~/.Xresources
-panel &
+panel_desktops &
+panel_center &
+panel_top_right &
+panel_warning &
+
+twmnd light &
+twmnd sound &
+#twmnd notifications &
 
 compton -bcCG --shadow-exclude '!focused' --no-fading-openclose
 
-bspc monitor -d      
+bspc config remove_unplugged_monitors true
+bspc config remove_disabled_monitors true
+
+
+bspc monitor eDP1 -d      
+bspc monitor HDMI2 -d VII VIII IX X
+
 
 bspc config border_width         0
 bspc config window_gap          20

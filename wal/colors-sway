@@ -1,0 +1,21 @@
+set $wallpaper /home/patrik/.wallpapers/city.jpg
+
+set $background #0B2025
+set $foreground #c8c6c4
+
+set $color0 #0B2025
+set $color1 #A06A40
+set $color2 #7D807F
+set $color3 #C79163
+set $color4 #087687
+set $color5 #527C84
+set $color6 #508A96
+set $color7 #c8c6c4
+set $color8 #8c8a89
+set $color9 #A06A40
+set $color10 #7D807F
+set $color11 #C79163
+set $color12 #087687
+set $color13 #527C84
+set $color14 #508A96
+set $color15 #c8c6c4

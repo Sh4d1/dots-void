@@ -1,0 +1,15 @@
+#!/bin/bash
+
+source "/home/patrik/.cache/wal/colors.sh"
+light -A 10
+
+icon=""
+
+color0=$(printf "#%06X" $((0x$(echo $color0 | cut -d '#' -f2) + 0x3F4F1)))
+color3=$(printf "#%06X" $((0x$(echo $color3 | cut -d '#' -f2) + 0x3F4F1)))
+
+MSG="<span style=\"color: $color3;\">$icon</span> $(query_backlight)"
+twmnc -c "$MSG" --id 40 -p 9799 --bg "$color0"
+
+
+

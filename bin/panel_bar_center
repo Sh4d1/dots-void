@@ -1,0 +1,24 @@
+#! /bin/sh
+#
+# Example panel for LemonBoy's bar
+
+. panel_colors
+
+PADDING=" "
+SEP="//"
+layout=""
+
+while read -r line ; do
+  case $line in
+    D*)
+      # date output
+      date="%{B$COLOR_BACKGROUND}$PADDING${line#?}$PADDING"
+      ;;
+    C*)
+      # clock output
+      clock="%{B$COLOR_BACKGROUND}$PADDING${line#?}$PADDING%{B-}"
+      ;;
+  esac
+  layout="%{c}$date$clock"
+  printf "%s\n" "${layout}"
+done

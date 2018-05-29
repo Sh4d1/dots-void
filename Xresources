@@ -4,9 +4,9 @@
 
 ! scrollbar
 URxvt*scrollBar: false
+URxvt*externalBorder: 0
 URxvt*internalBorder: 20
-
-URxvt*letterSpace: 0
+URxvt.letterSpace: 2
 !----------------
 !  Xft Settings
 !----------------

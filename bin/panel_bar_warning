@@ -1,0 +1,52 @@
+#! /bin/sh
+#
+# Example panel for LemonBoy's bar
+
+. panel_colors
+
+num_mon=$(bspc query -M | wc -l)
+PADDING=" "
+SEP="//"
+has_any=0
+while read -r line ; do
+    case $line in
+    F*)
+        # free space /home
+        free="$PADDING${line#?}$PADDING"
+        has_any=$(($has_any | (1 << 0)))
+        ;;
+    f*)
+        has_any=$(($has_any & (15 ^ (1<<0))))
+        ;;
+    R*)
+        # ram used
+        ram="$PADDING${line#?}$PADDING"
+        has_any=$(($has_any | (1 << 1)))
+        #echo $has_any
+        ;;
+    r*)
+        has_any=$(($has_any & (15 ^ (1<<1))))
+        ;;
+    P*)
+        # cpu usage
+        cpu="${line#?}$PADDING"
+        has_any=$(($has_any | (1 << 2)))
+        ;;
+    p*)
+        has_any=$(($has_any & (15 ^ (1<<2))))
+        ;;
+    A*)
+        # temperature
+        temp="$PADDING${line#?}$PADDING"
+        has_any=$(($has_any | (1 << 3)))
+        ;;
+    a*)
+        has_any=$(($has_any & (15 ^ (1<<3))))
+        ;;
+    esac
+    if [ "$has_any" -ne "0" ]; then
+        printf "%s\n" "%{B$COLOR_URGENT_BG}%{c}  ${temp}${cpu}${ram}${free} %{B-}"
+    else
+        printf "\n"
+    fi
+done

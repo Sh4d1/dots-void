@@ -8,7 +8,8 @@ super + Return
 
 # program launcher
 super + @space
-	rofi -show run -hide-scrollbar -width 25 -lines 1 -columns 2 -separator-style solid -yoffset 30 -location 2
+    rofi -show run -hide-scrollbar -width 25 -lines 0 -separator-style none -location 1 -xoffset 300 -yoffset 13 -font "FuraCode Nerd Font 12" -padding 1 -bw 0 -color-window "#00000000" -display-run "➜" -theme-str 'textbox-prompt-colon \{ str: "";\}'
+	#rofi -show run -hide-scrollbar -width 25 -lines 1 -columns 2 -separator-style solid -yoffset 30 -location 2
 
 super + shift + space
     rofi-pass
